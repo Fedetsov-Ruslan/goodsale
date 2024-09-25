@@ -1,0 +1,5 @@
+__pycache__
+.env
+venv
+elasticsearch_data
+elektronika_products_20240923_113957.xml

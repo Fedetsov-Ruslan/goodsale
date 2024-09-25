@@ -1,0 +1,44 @@
+services:
+  sales:
+    image: script_sale
+    depends_on:
+      - db
+      - elasticsearch
+    command: sh -c "sleep 10 && python script.py"
+    networks:
+      - analize
+
+  db:
+    image: postgres:16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    networks:
+      - analize
+
+  elasticsearch:
+    image: elasticsearch:8.7.0
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - node.name=odfe-node
+      - discovery.seed_hosts=odfe-node
+      - bootstrap.memory_lock=true
+      - xpack.security.enabled=false
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    volumes:
+      - ./elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - analize
+
+
+networks:
+  analize:
+    driver: bridge
+
